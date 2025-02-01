@@ -1,6 +1,6 @@
 ![image](https://i.imgur.com/TTpKgMs.png)
 
-We declare Goblin in-game. We start by getting its id.
+We declare Goblin in-game. We start by getting its id.<br>
 `database.query_with_bindings("SELECT id FROM Monsters WHERE name = ?", [monster_name])`
 
 **Monsters**
@@ -9,7 +9,7 @@ We declare Goblin in-game. We start by getting its id.
 |:-:|:-:|
 |1|Goblin|
 
-We get all loot tables belonging to the monster with that id.
+We get all loot tables belonging to the monster with that id.<br>
 `database.query_with_bindings("SELECT loot_table_id FROM MonsterLootTables WHERE monster_table_id = ?", [id])`
 
 **MonsterLootTables**
@@ -20,7 +20,7 @@ We get all loot tables belonging to the monster with that id.
 |2|	1|	2|
 |3|	1|	3|
 
-For each monster loot table tied to that id we get all loot entries belonging to that table
+For each monster loot table tied to that id we get all loot entries belonging to that table<br>
 `database.query_with_bindings("SELECT * FROM LootEntries WHERE loot_table_id = ?", [table["loot_table_id"]])`
 
 **LootEntries**
@@ -38,7 +38,7 @@ For each monster loot table tied to that id we get all loot entries belonging to
 |9|	1|	3|	12.0|	1|
 |10|1|	4|	12.0|	1|
 
-For each item in the table being iterated, we get the item name.
+For each item in the table being iterated, we get the item name.<br>
 `database.query_with_bindings("SELECT name FROM Items WHERE id = ?", [item["item_id"]])`
 
 **Items**
