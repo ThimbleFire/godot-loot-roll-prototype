@@ -1,11 +1,11 @@
 [gd_scene load_steps=9 format=3 uid="uid://c43lach4rl63y"]
 
-[ext_resource type="Script" path="res://addons/affix.idb/EditorControl.gd" id="1_gxssc"]
-[ext_resource type="Script" path="res://addons/affix.idb/combobox.gd" id="2_2ujb3"]
-[ext_resource type="Script" path="res://addons/affix.idb/monster_builder_controls.gd" id="3_3f6st"]
-[ext_resource type="Script" path="res://addons/affix.idb/bind_items_to_tables_control.gd" id="3_gl54r"]
-[ext_resource type="Script" path="res://addons/affix.idb/item_builder_controls.gd" id="4_fjk74"]
-[ext_resource type="Script" path="res://addons/affix.idb/table_builder_controls.gd" id="5_4rw55"]
+[ext_resource type="Script" path="res://addons/affix.idb/EditorControl.gd" id="1_th4b5"]
+[ext_resource type="Script" path="res://addons/affix.idb/combobox.gd" id="2_tllp7"]
+[ext_resource type="Script" path="res://addons/affix.idb/bind_items_to_tables_control.gd" id="3_vpp0t"]
+[ext_resource type="Script" path="res://addons/affix.idb/monster_builder_controls.gd" id="4_xvjam"]
+[ext_resource type="Script" path="res://addons/affix.idb/item_builder_controls.gd" id="5_x68gr"]
+[ext_resource type="Script" path="res://addons/affix.idb/table_builder_controls.gd" id="6_3hbna"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_pmsgt"]
 
@@ -17,10 +17,11 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-current_tab = 0
-script = ExtResource("1_gxssc")
+current_tab = 1
+script = ExtResource("1_th4b5")
 
 [node name="Bind Tables to Monsters" type="Panel" parent="."]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
@@ -39,7 +40,7 @@ placeholder_text = "Filter by name"
 [node name="OptionButton" type="OptionButton" parent="Bind Tables to Monsters/Filter"]
 layout_mode = 2
 allow_reselect = true
-script = ExtResource("2_2ujb3")
+script = ExtResource("2_tllp7")
 
 [node name="Add" type="VBoxContainer" parent="Bind Tables to Monsters"]
 layout_direction = 1
@@ -107,9 +108,8 @@ hide_root = true
 scroll_horizontal_enabled = false
 
 [node name="Bind Items to Tables" type="Panel" parent="."]
-visible = false
 layout_mode = 2
-script = ExtResource("3_gl54r")
+script = ExtResource("3_vpp0t")
 metadata/_tab_index = 1
 
 [node name="LineEdit" type="LineEdit" parent="Bind Items to Tables"]
@@ -271,7 +271,7 @@ scroll_horizontal_enabled = false
 [node name="Monster Builder" type="Panel" parent="."]
 visible = false
 layout_mode = 2
-script = ExtResource("3_3f6st")
+script = ExtResource("4_xvjam")
 metadata/_tab_index = 2
 
 [node name="txtMonsterName" type="LineEdit" parent="Monster Builder"]
@@ -337,7 +337,7 @@ text = "Delete Monster and its TableEntries"
 [node name="Item Builder" type="Panel" parent="."]
 visible = false
 layout_mode = 2
-script = ExtResource("4_fjk74")
+script = ExtResource("5_x68gr")
 metadata/_tab_index = 3
 
 [node name="txtItemName" type="LineEdit" parent="Item Builder"]
@@ -403,7 +403,7 @@ text = "Delete Item and remove it from all its ItemEntries"
 [node name="Table Builder" type="Panel" parent="."]
 visible = false
 layout_mode = 2
-script = ExtResource("5_4rw55")
+script = ExtResource("6_3hbna")
 metadata/_tab_index = 4
 
 [node name="txtTableName" type="LineEdit" parent="Table Builder"]

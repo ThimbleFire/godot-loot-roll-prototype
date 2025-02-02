@@ -36,7 +36,7 @@ func _on_item_selected(index: int) -> void:
 func compile_database_view(selected_name) -> void:
 	var option_button: OptionButton = $"../../Add/OptionButton"
 	option_button.clear()
-	var tree = $"../../Tree"
+	var tree: Tree = $"../../Tree"
 	tree.clear()
 	root = tree.create_item()
 	tree.set_column_title(0, "item_id")

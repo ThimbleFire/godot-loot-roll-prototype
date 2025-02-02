@@ -1,11 +1,11 @@
 @tool
 extends Panel
 
-var database: SQLite
 var root: TreeItem
 var selected_table
+var database: SQLite
 
-func _enter_tree() -> void:	
+func _enter_tree() -> void:
 	database = SQLite.new()
 	database.open_db()
 	
