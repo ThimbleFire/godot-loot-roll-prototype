@@ -34,7 +34,7 @@ func _on_item_selected(index: int) -> void:
 	pass
 
 func compile_database_view(selected_name) -> void:
-	var option_button: OptionButton = $"../../VBoxContainer3/OptionButton"
+	var option_button: OptionButton = $"../../Add/OptionButton"
 	option_button.clear()
 	var tree = $"../../Tree"
 	tree.clear()
@@ -60,20 +60,20 @@ func compile_database_view(selected_name) -> void:
 		option_button.add_item(loot_table["name"])
 	
 func _on_btn_down_remove_table() -> void:
-	var option_button: OptionButton = $"../../VBoxContainer3/OptionButton"
+	var option_button: OptionButton = $"../../Remove/OptionButton"
 	var table_name = option_button.get_item_text(option_button.selected)
 	database.query_with_bindings("DELETE FROM TableEntries WHERE name = ? AND monster_table_id = ?", [table_name, selected_monster["id"]])
 	compile_database_view(selected_monster["name"])
 	
 func _on_txtAddLootTableSearch_text_changed(new_text: String) -> void:
-	var option_button: OptionButton = $"../../VBoxContainer2/OptionButton"
+	var option_button: OptionButton = $"../../Add/OptionButton"
 	option_button.clear()
 	database.query_with_bindings("SELECT name FROM LootTables WHERE name LIKE ?", ["%"+new_text+"%"])
 	for loot_table in database.query_result:
 		option_button.add_item(loot_table["name"])
 		
 func _on_btn_down_add_table() -> void:
-	var option_button: OptionButton = $"../../VBoxContainer2/OptionButton"
+	var option_button: OptionButton = $"../../Add/OptionButton"
 	var table_name = option_button.get_item_text(option_button.selected)
 	database.query_with_bindings("SELECT * FROM LootTables WHERE name = ?", [table_name])
 	var product: Dictionary = database.query_result.front()

@@ -28,6 +28,7 @@ func _on_button_pressed() -> void:
 	
 func _on_txt_monster_search_text_changed(new_text: String) -> void:
 	var option_button = $OptionButton
+	option_button.clear()
 	database.query_with_bindings("SELECT * FROM Monsters WHERE name LIKE ?", ["%"+new_text+"%"])
 	for monster_name in database.query_result:
 		option_button.add_item(monster_name["name"])
