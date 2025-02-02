@@ -14,15 +14,19 @@ func _enter_tree() -> void:
 	var texture:Texture = load("res://addons/affix.idb/btn_new.png")
 	
 	treeItems = add_tree_header("Items", texture)
-	populate_items(treeItems)
+	populate_table_entries(treeItems)
 	
 	treeMonsters = add_tree_header("Monsters", texture)
-	#populate_category(treeMonsters)
+	populate_table_entries(treeMonsters)
 	
-	treeTables = add_tree_header("Tables", texture)
-	#populate_category(treeTables)
+	treeTables = add_tree_header("LootTables", texture)
+	populate_table_entries(treeTables)
+	
+	var tableEntries = add_tree_header("TableEntries", texture)
+	
 	
 func _exit_tree() -> void:
+	$Tree.clear()
 	database.close_db()
 	pass
 	
@@ -36,11 +40,11 @@ func add_tree_header(title:String, texture:Texture2D) -> TreeItem:
 
 func populate_items(treeItem: TreeItem) -> void:
 	var category_name = treeItem.get_text(0)
-	
-	database.query("SELECT * FROM Items")
-	
+	var query = "SELECT * FROM " + category_name
+	database.query(query)
+	print(database.query_result.size())
 	for row in database.query_result:
-		var ch = treeItems.create_child()
+		var ch = treeItem.create_child()
 		ch.set_text(0, "id")
 		ch.set_text(1, str(row["id"]))
 		
@@ -48,5 +52,22 @@ func populate_items(treeItem: TreeItem) -> void:
 		ch.set_text(0, "name")
 		ch.set_text(1, row["name"])
 		ch.set_editable(1, true)
-
+		ch.set_custom_bg_color(1, Color(0.113, 0.133, 0.16))
 		
+
+func populate_table_entries(treeItem: TreeItem) -> void:
+	var category_name = treeItem.get_text(0)
+	var query = "SELECT * FROM " + category_name
+	database.query(query)    
+	print("Rows found:", database.query_result.size())
+	for row in database.query_result:
+		var ch = treeItem.create_child()  # Create a child for each row
+		for key in row.keys():  # Loop through column names (keys)
+			var field = ch.create_child()  # Create a new child per field
+			field.set_text(0, key)  # Set column name
+			field.set_text(1, str(row[key]))  # Convert value to string            
+			# Make text editable if it's a string (e.g., names)
+			if typeof(row[key]) == TYPE_STRING:
+				field.set_editable(1, true)            
+			# Set background color for the value column
+			field.set_custom_bg_color(1, Color(0.113, 0.133, 0.16))
