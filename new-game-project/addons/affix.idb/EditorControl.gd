@@ -13,16 +13,11 @@ func _enter_tree() -> void:
 	root = $Tree.create_item()
 	var texture:Texture = load("res://addons/affix.idb/btn_new.png")
 	
-	treeItems = add_tree_header("Items", texture)
-	populate_table_entries(treeItems)
-	
-	treeMonsters = add_tree_header("Monsters", texture)
-	populate_table_entries(treeMonsters)
-	
-	treeTables = add_tree_header("LootTables", texture)
-	populate_table_entries(treeTables)
-	
-	var tableEntries = add_tree_header("TableEntries", texture)
+	add_tree_header("Items", texture)	
+	add_tree_header("Monsters", texture)	
+	add_tree_header("LootTables", texture)	
+	add_tree_header("TableEntries", texture)
+	add_tree_header("ItemEntries", texture)
 	
 	
 func _exit_tree() -> void:
@@ -30,27 +25,31 @@ func _exit_tree() -> void:
 	database.close_db()
 	pass
 	
-func add_tree_header(title:String, texture:Texture2D) -> TreeItem:
+func add_tree_header(title:String, texture:Texture2D) -> void:
 	var treeItem: TreeItem = $Tree.create_item(root)
 	treeItem.set_text(0, title)
 	treeItem.set_icon(0, texture)
 	treeItem.set_text_alignment(0, HORIZONTAL_ALIGNMENT_LEFT)
 	treeItem.set_custom_bg_color(0, Color(0.25, 0.26, 0.298))
-	return treeItem
+	populate_table_entries(treeItem)
 
+# this is cool but it's not scaleable, we should consider reverting back to having individual functions setting up tables
 func populate_table_entries(treeItem: TreeItem) -> void:
 	var category_name = treeItem.get_text(0)
 	var query = "SELECT * FROM " + category_name
 	database.query(query)    
 	print("Rows found:", database.query_result.size())
 	for row in database.query_result:
+		var ch = treeItem.create_child()
 		for key in row.keys():  # Loop through column names (keys)
-			var field = treeItem.create_child()
-
+			var field = ch.create_child()
+			# the database column name
 			field.set_text(0, key)  # Set column name
-
-			field.set_editable(1, true)  
-			field.set_custom_bg_color(1, Color(0.113, 0.133, 0.16))
+			# set the item to be editable so long as its not a reference to an id
+			if not key.ends_with("id"):
+				field.set_editable(1, true)  
+				field.set_custom_bg_color(1, Color(0.113, 0.133, 0.16))
+			# set the field type according to the datatype
 			match typeof(row[key]):
 				TYPE_INT:
 					field.set_range(1, row[key])
@@ -60,21 +59,11 @@ func populate_table_entries(treeItem: TreeItem) -> void:
 					field.set_range_config(1, 0, 255, 0.01) 
 				TYPE_STRING:
 					field.set_text(1, row[key])
-
-# below are signals belonging to Tree. Trying to figure out how to invoke a response when a row's column is changed so we can instruct the database to update.
-
-func check_propagated_to_item(item: TreeItem, column: int) -> void:
-	pass
-
-func custom_item_clicked(mouse_button_index: int) -> void:
-	# Emitted when an item with TreeItem.CELL_MODE_CUSTOM is clicked with a mouse button.
-	pass
+				TYPE_BOOL:
+					# untested
+					field.set_checked(1, row[key])
 
 func item_edited() -> void:
-	pass
-
-func item_selected() -> void:
-	pass
-
-func cell_selected() -> void:
-	pass
+	var treeItem: TreeItem = $Tree.get_edited()
+	var ch = treeItem.get_parent()
+	var category = ch.get_text(0)
