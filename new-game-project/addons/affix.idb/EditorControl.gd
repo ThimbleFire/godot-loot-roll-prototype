@@ -39,31 +39,35 @@ func populate_table_entries(treeItem: TreeItem) -> void:
 	var query = "SELECT * FROM " + category_name
 	database.query(query)    
 	print("Rows found:", database.query_result.size())
+
 	for row in database.query_result:
 		var ch = treeItem.create_child()
+
 		for key in row.keys():  # Loop through column names (keys)
 			var field = ch.create_child()
-			# the database column name
 			field.set_text(0, key)  # Set column name
-			# set the item to be editable so long as its not a reference to an id
-			if not key.ends_with("id"):
-				field.set_editable(1, true)  
-				field.set_custom_bg_color(1, Color(0.113, 0.133, 0.16))
-			# set the field type according to the datatype
+
+			# don't allow editing for foreign key ids
+			var is_id = key.ends_with("id")
+
 			match typeof(row[key]):
-				TYPE_INT:
+				TYPE_INT, TYPE_FLOAT:
 					field.set_range(1, row[key])
 					field.set_range_config(1, 0, 255, 1) 
-				TYPE_FLOAT:
-					field.set_range(1, row[key])
-					field.set_range_config(1, 0, 255, 0.01) 
 				TYPE_STRING:
 					field.set_text(1, row[key])
 				TYPE_BOOL:
-					# untested
 					field.set_checked(1, row[key])
+
+			if not is_id:
+				field.set_editable(1, true)  
+				field.set_custom_bg_color(1, Color(0.113, 0.133, 0.16))
+
 
 func item_edited() -> void:
 	var treeItem: TreeItem = $Tree.get_edited()
-	var ch = treeItem.get_parent()
-	var category = ch.get_text(0)
+	var row_item = treeItem.get_parent()
+	var table_name row_item.get_parent().get_text(0)
+	print(table_name)
+
+	
