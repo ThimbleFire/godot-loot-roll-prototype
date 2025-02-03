@@ -6,18 +6,18 @@ var root: TreeItem
 var texture_delete: Texture2D = preload("res://addons/affix.idb/btn_delete.png")
 var texture: Texture2D = preload("res://addons/affix.idb/btn_new.png")
 var database: SQLite
-	
+var table_names = []
+
 func _enter_tree() -> void:
 	database = SQLite.new()
 	database.open_db()
 	tree = $Tree
 	root = tree.create_item()
 	
-	add_tree_header("Items")
-	add_tree_header("Monsters")
-	add_tree_header("LootTables")
-	add_tree_header("TableEntries")
-	add_tree_header("ItemEntries")
+	database.query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
+	table_names = database.query_result
+	for table_name in table_names:
+		add_tree_header(table_name["name"])
 	
 func _exit_tree() -> void:
 	tree.clear()
@@ -61,7 +61,7 @@ func populate_table_entries(treeItem: TreeItem) -> void:
 					field.set_checked(1, row[key])
 			if not is_id:
 				field.set_editable(1, true)  
-				field.set_custom_bg_color(1, Color(0.113, 0.133, 0.16))
+				field.set_custom_bg_color(1, Color(0.21, 0.21, 0.3))
 	
 func item_edited() -> void:
 	var treeItem: TreeItem = tree.get_edited()
@@ -77,5 +77,7 @@ func _on_tree_button_clicked(item: TreeItem, column: int, id: int, mouse_button_
 func _on_btn_add_pressed() -> void:
 	var popup:MyPopup = preload("res://addons/affix.idb/popup_window_on_add.tscn").instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
 	add_child(popup)
-	var dictionary = await popup.button_pressed
+	var content = await popup.button_pressed
 	popup.queue_free()
+	var index = table_names.find(content["table_name"])
+	print(root.get_child(index).get_text(0))

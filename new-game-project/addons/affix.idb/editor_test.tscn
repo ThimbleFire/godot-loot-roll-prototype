@@ -53,6 +53,7 @@ columns = 2
 allow_search = false
 enable_recursive_folding = false
 hide_root = true
+scroll_horizontal_enabled = false
 
 [connection signal="pressed" from="MarginContainer/HBoxContainer/btn_add" to="." method="_on_btn_add_pressed"]
 [connection signal="button_clicked" from="Tree" to="." method="_on_tree_button_clicked"]

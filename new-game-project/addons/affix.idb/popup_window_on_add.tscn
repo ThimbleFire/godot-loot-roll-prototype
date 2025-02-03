@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://cpmeouk46x6iy"]
+[gd_scene load_steps=5 format=3 uid="uid://cpmeouk46x6iy"]
 
 [ext_resource type="Script" path="res://addons/affix.idb/popup_window_on_add.gd" id="1_d2sp1"]
+[ext_resource type="Theme" uid="uid://bm6qtua01kp2g" path="res://new_theme.tres" id="2_tlk67"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_51qgy"]
 bg_color = Color(0.211521, 0.23888, 0.290166, 1)
@@ -11,8 +12,13 @@ bg_color = Color(0.145083, 0.168536, 0.203708, 1)
 [node name="Window" type="Window"]
 title = "Add New Field"
 initial_position = 1
-size = Vector2i(415, 160)
+size = Vector2i(415, 320)
+unresizable = true
+always_on_top = true
+popup_window = true
 script = ExtResource("1_d2sp1")
+
+[node name="PopupMenu" type="PopupMenu" parent="."]
 
 [node name="background" type="Panel" parent="."]
 anchors_preset = 15
@@ -25,34 +31,77 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_51qgy")
 [node name="OptionButton" type="OptionButton" parent="background"]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.25
-anchor_top = 0.2
-anchor_right = 0.75
-anchor_bottom = 0.2
+anchor_left = 0.3
+anchor_top = 0.1
+anchor_right = 0.7
+anchor_bottom = 0.1
 offset_left = -16.0
-offset_top = -10.0
+offset_top = -11.5
 offset_right = 16.0
-offset_bottom = 10.0
+offset_bottom = 11.5
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("2_tlk67")
+flat = true
 selected = 0
+item_count = 5
+popup/item_0/text = "Items"
+popup/item_1/text = "LootTables"
+popup/item_1/id = 1
+popup/item_2/text = "Monsters"
+popup/item_2/id = 2
+popup/item_3/text = "ItemEntries"
+popup/item_3/id = 3
+popup/item_4/text = "TableEntries"
+popup/item_4/id = 4
 
 [node name="Button" type="Button" parent="background"]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.25
-anchor_top = 0.8
+anchor_top = 0.9
 anchor_right = 0.75
-anchor_bottom = 0.8
+anchor_bottom = 0.9
 offset_left = -42.5
 offset_top = -15.5
 offset_right = 42.5
 offset_bottom = 15.5
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("2_tlk67")
 theme_override_styles/normal = SubResource("StyleBoxFlat_4hgr4")
 text = "Add Table"
 
+[node name="Panel" type="Panel" parent="background"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.1
+anchor_top = 0.25
+anchor_right = 0.9
+anchor_bottom = 0.75
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Tree" type="Tree" parent="background/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+columns = 2
+allow_reselect = true
+allow_search = false
+enable_recursive_folding = false
+hide_root = true
+scroll_horizontal_enabled = false
+
 [connection signal="close_requested" from="." to="." method="_on_close_requested"]
+[connection signal="id_pressed" from="PopupMenu" to="." method="_on_popup_menu_id_pressed"]
 [connection signal="item_selected" from="background/OptionButton" to="." method="_on_option_button_item_selected"]
 [connection signal="pressed" from="background/Button" to="." method="_on_button_pressed"]
+[connection signal="cell_selected" from="background/Panel/Tree" to="." method="_on_tree_cell_selected"]
