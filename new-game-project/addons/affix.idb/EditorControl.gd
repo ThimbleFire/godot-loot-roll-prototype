@@ -38,23 +38,6 @@ func add_tree_header(title:String, texture:Texture2D) -> TreeItem:
 	treeItem.set_custom_bg_color(0, Color(0.25, 0.26, 0.298))
 	return treeItem
 
-func populate_items(treeItem: TreeItem) -> void:
-	var category_name = treeItem.get_text(0)
-	var query = "SELECT * FROM " + category_name
-	database.query(query)
-	print(database.query_result.size())
-	for row in database.query_result:
-		var ch = treeItem.create_child()
-		ch.set_text(0, "id")
-		ch.set_text(1, str(row["id"]))
-		
-		ch = treeItem.create_child()
-		ch.set_text(0, "name")
-		ch.set_text(1, row["name"])
-		ch.set_editable(1, true)
-		ch.set_custom_bg_color(1, Color(0.113, 0.133, 0.16))
-		
-
 func populate_table_entries(treeItem: TreeItem) -> void:
 	var category_name = treeItem.get_text(0)
 	var query = "SELECT * FROM " + category_name
@@ -77,3 +60,21 @@ func populate_table_entries(treeItem: TreeItem) -> void:
 					field.set_range_config(1, 0, 255, 0.01) 
 				TYPE_STRING:
 					field.set_text(1, row[key])
+
+# below are signals belonging to Tree. Trying to figure out how to invoke a response when a row's column is changed so we can instruct the database to update.
+
+func check_propagated_to_item(item: TreeItem, column: int) -> void:
+	pass
+
+func custom_item_clicked(mouse_button_index: int) -> void:
+	# Emitted when an item with TreeItem.CELL_MODE_CUSTOM is clicked with a mouse button.
+	pass
+
+func item_edited() -> void:
+	pass
+
+func item_selected() -> void:
+	pass
+
+func cell_selected() -> void:
+	pass
