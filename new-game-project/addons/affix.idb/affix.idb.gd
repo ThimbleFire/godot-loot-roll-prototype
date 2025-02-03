@@ -1,5 +1,6 @@
 @tool
 extends EditorPlugin
+
 var dock
 
 var controller: EditorController
