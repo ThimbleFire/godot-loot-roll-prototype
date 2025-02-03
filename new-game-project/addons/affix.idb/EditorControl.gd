@@ -61,13 +61,19 @@ func populate_table_entries(treeItem: TreeItem) -> void:
 	database.query(query)    
 	print("Rows found:", database.query_result.size())
 	for row in database.query_result:
-		var ch = treeItem.create_child()  # Create a child for each row
 		for key in row.keys():  # Loop through column names (keys)
-			var field = ch.create_child()  # Create a new child per field
+			var field = treeItem.create_child()
+
 			field.set_text(0, key)  # Set column name
-			field.set_text(1, str(row[key]))  # Convert value to string            
-			# Make text editable if it's a string (e.g., names)
-			if typeof(row[key]) == TYPE_STRING:
-				field.set_editable(1, true)            
-			# Set background color for the value column
+
+			field.set_editable(1, true)  
 			field.set_custom_bg_color(1, Color(0.113, 0.133, 0.16))
+			match typeof(row[key]):
+				TYPE_INT:
+					field.set_range(1, row[key])
+					field.set_range_config(1, 0, 255, 1) 
+				TYPE_FLOAT:
+					field.set_range(1, row[key])
+					field.set_range_config(1, 0, 255, 0.01) 
+				TYPE_STRING:
+					field.set_text(1, row[key])
