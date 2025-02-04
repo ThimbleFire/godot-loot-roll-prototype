@@ -1,9 +1,9 @@
 @tool
-extends EditorPlugin
+class_name Pluggy extends EditorPlugin
 
 var dock
-
 var controller: EditorController
+static var database: SQLite
 
 func _enter_tree():
 	add_custom_type("EditorControl", "TabContainer", preload("res://addons/affix.idb/EditorControl.gd"), preload("res://icon.svg"))

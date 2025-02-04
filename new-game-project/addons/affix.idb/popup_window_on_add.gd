@@ -4,7 +4,6 @@ class_name MyPopup extends Window
 var tree: Tree
 var root: TreeItem
 var header: TreeItem
-var database: SQLite
 var popup: PopupMenu
 var option_button: OptionButton
 var instanced_ui_elements = []
@@ -13,19 +12,18 @@ signal button_pressed
 	
 func _enter_tree() -> void:
 	option_button = $background/OptionButton
+	option_button.clear()
 	popup = $PopupMenu
 	tree = $background/Panel/Tree
-	database = SQLite.new()
-	database.open_db()
-	database.query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
-	for table_name in database.query_result:
+	Pluggy.database.query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
+	for table_name in Pluggy.database.query_result:
 		option_button.add_item(table_name["name"])
 	
 func _exit_tree() -> void:
-	database.close_db()
 	option_button.clear()
 	
 func _on_close_requested() -> void:
+	option_button.clear()
 	queue_free()
 	
 func _on_option_button_item_selected(index: int) -> void:
@@ -40,11 +38,11 @@ func _on_option_button_item_selected(index: int) -> void:
 	header.set_custom_bg_color(0, Color(0.25, 0.26, 0.298))
 	header.set_custom_bg_color(1, Color(0.25, 0.26, 0.298))
 	
-	database.query("PRAGMA table_info("+table_name+")")
-	var table_fields = database.query_result
+	Pluggy.database.query("PRAGMA table_info("+table_name+")")
+	var table_fields = Pluggy.database.query_result
 	
-	database.query("PRAGMA foreign_key_list("+table_name+")")
-	var table_foreign_keys = database.query_result
+	Pluggy.database.query("PRAGMA foreign_key_list("+table_name+")")
+	var table_foreign_keys = Pluggy.database.query_result
 	
 	for row in table_fields:
 		if row["name"] == "id":
@@ -64,16 +62,16 @@ func _on_tree_cell_selected() -> void:
 	popup.clear(true)
 	var table_name = item.get_metadata(1)["table_name"]
 	var row_name = item.get_metadata(1)["name"]
-	database.query("PRAGMA foreign_key_list(" + table_name + ")")
+	Pluggy.database.query("PRAGMA foreign_key_list(" + table_name + ")")
 	var referenced_table = ""
-	for row in database.query_result:
+	for row in Pluggy.database.query_result:
 		if row["from"] == row_name:  # Match the foreign key column
 			referenced_table = row["table"]
 			break
 	
 	if referenced_table != "":
-		database.query("SELECT name FROM " + referenced_table)
-		for result in database.query_result:
+		Pluggy.database.query("SELECT name FROM " + referenced_table)
+		for result in Pluggy.database.query_result:
 			popup.add_item(result["name"])
 			
 	var button_rect: Rect2i = tree.get_item_area_rect(item, 1)
@@ -100,9 +98,9 @@ func _on_button_pressed() -> void:
 		var value = item.get_text(1)
 		row_data[key] = value
 	
-	database.insert_row(table_name, row_data)
+	Pluggy.database.insert_row(table_name, row_data)
 	
-	var last_inserted_row: int = database.last_insert_rowid
+	var last_inserted_row = Pluggy.database.last_insert_rowid
 	var actual_data = { "id": last_inserted_row }
 	actual_data.merge(row_data)
 	button_pressed.emit({"table_name": table_name, "row_data": actual_data})

@@ -3,18 +3,16 @@ class_name EditorController extends Control
 
 var tree: Tree
 var root: TreeItem
-var database: SQLite
 var table_names = []
 
 func _exit_tree() -> void:
+	Pluggy.database.close_db()
 	tree.clear()
-	database.close_db()
 	pass
 
 func _enter_tree() -> void:
-	database = SQLite.new()
-	database.open_db()
-	database.foreign_keys = true
+	Pluggy.database = SQLite.new()
+	Pluggy.database.open_db()
 	tree = $Tree
 	populate_database_view()
 	
@@ -22,8 +20,8 @@ func populate_database_view() -> void:
 	tree.clear()
 	root = tree.create_item()
 	
-	database.query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
-	for table_name in database.query_result:
+	Pluggy.database.query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
+	for table_name in Pluggy.database.query_result:
 		table_names.push_back(table_name["name"])
 		build_table(table_name["name"])
 	
@@ -33,12 +31,12 @@ func build_table(table_name:String) -> void:
 	table_item.set_text_alignment(0, HORIZONTAL_ALIGNMENT_LEFT)
 	table_item.set_custom_bg_color(0, Color(0.25, 0.26, 0.298))
 	table_item.set_custom_bg_color(1, Color(0.25, 0.26, 0.298))
-	database.query("SELECT * FROM " + table_name)
-	if database.query_result.is_empty():
+	Pluggy.database.query("SELECT * FROM " + table_name)
+	if Pluggy.database.query_result.is_empty():
 		return
-	for row_data in database.query_result:
+	for row_data in Pluggy.database.query_result:
 		add_row(table_item, row_data)
-	var keys = database.query_result.front()
+	var keys = Pluggy.database.query_result.front()
 	keys = keys.keys()
 	table_item.set_metadata(0, keys)
 	table_item.set_collapsed_recursive(true)
@@ -51,40 +49,44 @@ func add_row(table_item: TreeItem, row_data: Dictionary) -> void:
 	for key in row_data.keys():
 		var field = row.create_child()
 		field.set_text(0, key)  # Set column name
-		field.set_text(1, str(row_data[key]))	
+		field.set_text(1, str(row_data[key]))
 		var is_id = key.ends_with("id")
 		if not is_id:
 			field.set_editable(1, true)
 			field.set_custom_bg_color(1, Color(0.21, 0.21, 0.3))
+		else:
+			continue
 	
 func item_edited() -> void:
 	var treeItem: TreeItem = tree.get_edited()
 	var dictionary = treeItem.get_parent().get_metadata(0)
 	var table_name = treeItem.get_parent().get_parent().get_text(0)
 	dictionary[treeItem.get_text(0)] = str(treeItem.get_text(1))
-	database.update_rows(table_name, "id = " + str(dictionary["id"]), dictionary)
+	Pluggy.database.update_rows(table_name, "id = " + str(dictionary["id"]), dictionary)
 
 func _on_tree_button_clicked(item: TreeItem, column: int, id: int, mouse_button_index: int) -> void:
-	database.foreign_keys = true
-	database.query("PRAGMA foreign_keys = ON;")
+	Pluggy.database.foreign_keys = true
+	Pluggy.database.query("PRAGMA foreign_keys = ON;")
 	var table_name = item.get_parent().get_text(0)
-	database.query_with_bindings("DELETE FROM " + table_name + " WHERE id = ?", [str(item.get_metadata(0)["id"])])
+	Pluggy.database.query_with_bindings("DELETE FROM " + table_name + " WHERE id = ?", [str(item.get_metadata(0)["id"])])
 	item.get_parent().remove_child(item)
 
 	# loop through all the tables
 	for table in table_names:
 		# get the tables foreign key list
-		database.query("PRAGMA foreign_key_list("+table+")")
+		Pluggy.database.query("PRAGMA foreign_key_list("+table+")")
 		# for each foreign key
-		for brr in database.query_result:
+		for foreign_key in Pluggy.database.query_result:
 			# if that key is used by this table
-			if table_name == brr["table"]:
+			if table_name == foreign_key["table"]:
 				# get the table
 				var t: TreeItem = get_tree_table_by_table_name(table)
 				# for each child of the table
 				for ch in t.get_children():
 					# if the child's foreign key value is equal to the key being deleted
-					if ch.get_metadata(0)[brr["from"]] == item.get_metadata(0)["id"]:
+					var table_column_name = ch.get_metadata(0)[foreign_key["from"]]
+					var table_column_value = str(item.get_metadata(0)["id"])
+					if table_column_name == table_column_value:
 						t.remove_child(ch)
 
 func _on_btn_add_pressed() -> void:
