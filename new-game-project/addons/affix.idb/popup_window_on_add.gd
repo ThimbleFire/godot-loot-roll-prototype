@@ -94,7 +94,6 @@ func _on_button_pressed() -> void:
 	var child_count = header.get_child_count()
 
 	var row_data = {}
-	
 	for i in range(0, child_count):
 		var item: TreeItem = header.get_child(i)
 		var key = item.get_text(0)
@@ -103,5 +102,7 @@ func _on_button_pressed() -> void:
 	
 	database.insert_row(table_name, row_data)
 	
-	row_data["id"] = database.last_inserted_row()
-	button_pressed.emit({"table_name": table_name, "row_data": row_data})
+	var last_inserted_row: int = database.last_insert_rowid
+	var actual_data = { "id": last_inserted_row }
+	actual_data.merge(row_data)
+	button_pressed.emit({"table_name": table_name, "row_data": actual_data})

@@ -44,7 +44,7 @@ grow_vertical = 2
 theme = ExtResource("2_tlk67")
 flat = true
 selected = 0
-item_count = 5
+item_count = 10
 popup/item_0/text = "Items"
 popup/item_1/text = "LootTables"
 popup/item_1/id = 1
@@ -54,6 +54,16 @@ popup/item_3/text = "ItemEntries"
 popup/item_3/id = 3
 popup/item_4/text = "TableEntries"
 popup/item_4/id = 4
+popup/item_5/text = "Items"
+popup/item_5/id = 5
+popup/item_6/text = "LootTables"
+popup/item_6/id = 6
+popup/item_7/text = "Monsters"
+popup/item_7/id = 7
+popup/item_8/text = "ItemEntries"
+popup/item_8/id = 8
+popup/item_9/text = "TableEntries"
+popup/item_9/id = 9
 
 [node name="Button" type="Button" parent="background"]
 layout_mode = 1

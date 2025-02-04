@@ -14,6 +14,7 @@ func _exit_tree() -> void:
 func _enter_tree() -> void:
 	database = SQLite.new()
 	database.open_db()
+	database.foreign_keys = true
 	tree = $Tree
 	populate_database_view()
 	
@@ -22,8 +23,8 @@ func populate_database_view() -> void:
 	root = tree.create_item()
 	
 	database.query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
-	table_names = database.query_result
-	for table_name in table_names:
+	for table_name in database.query_result:
+		table_names.push_back(table_name["name"])
 		build_table(table_name["name"])
 	
 func build_table(table_name:String) -> void:
@@ -33,11 +34,16 @@ func build_table(table_name:String) -> void:
 	table_item.set_custom_bg_color(0, Color(0.25, 0.26, 0.298))
 	table_item.set_custom_bg_color(1, Color(0.25, 0.26, 0.298))
 	database.query("SELECT * FROM " + table_name)
+	if database.query_result.is_empty():
+		return
 	for row_data in database.query_result:
 		add_row(table_item, row_data)
+	var keys = database.query_result.front()
+	keys = keys.keys()
+	table_item.set_metadata(0, keys)
 	table_item.set_collapsed_recursive(true)
 
-func add_row(table_item: TreeItem, row_data: Dictionary) -> TreeItem:
+func add_row(table_item: TreeItem, row_data: Dictionary) -> void:
 	var row:TreeItem = table_item.create_child()
 	row.add_button(1, preload("res://addons/affix.idb/btn_delete.png"))
 	row.set_text(0, str(row_data["id"]))
@@ -59,14 +65,36 @@ func item_edited() -> void:
 	database.update_rows(table_name, "id = " + str(dictionary["id"]), dictionary)
 
 func _on_tree_button_clicked(item: TreeItem, column: int, id: int, mouse_button_index: int) -> void:
+	database.foreign_keys = true
+	database.query("PRAGMA foreign_keys = ON;")
 	var table_name = item.get_parent().get_text(0)
-	print(item.get_metadata(0))
+	database.query_with_bindings("DELETE FROM " + table_name + " WHERE id = ?", [str(item.get_metadata(0)["id"])])
+	item.get_parent().remove_child(item)
+
+	# loop through all the tables
+	for table in table_names:
+		# get the tables foreign key list
+		database.query("PRAGMA foreign_key_list("+table+")")
+		# for each foreign key
+		for brr in database.query_result:
+			# if that key is used by this table
+			if table_name == brr["table"]:
+				# get the table
+				var t: TreeItem = get_tree_table_by_table_name(table)
+				# for each child of the table
+				for ch in t.get_children():
+					# if the child's foreign key value is equal to the key being deleted
+					if ch.get_metadata(0)[brr["from"]] == item.get_metadata(0)["id"]:
+						t.remove_child(ch)
 
 func _on_btn_add_pressed() -> void:
 	var popup:MyPopup = preload("res://addons/affix.idb/popup_window_on_add.tscn").instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
 	add_child(popup)
 	var content = await popup.button_pressed
-	popup.queue_free()
-	var index = table_names.find(content["table_name"])
-	var table_item = root.get_child(index)
+	popup.queue_free()	
+	var table_item = get_tree_table_by_table_name(content["table_name"])
 	add_row(table_item, content["row_data"])
+	
+func get_tree_table_by_table_name(name) -> TreeItem:
+	var index = table_names.find(name)
+	return root.get_child(index)
