@@ -103,4 +103,5 @@ func _on_button_pressed() -> void:
 	
 	database.insert_row(table_name, row_data)
 	
+	row_data["id"] = database.last_inserted_row()
 	button_pressed.emit({"table_name": table_name, "row_data": row_data})
