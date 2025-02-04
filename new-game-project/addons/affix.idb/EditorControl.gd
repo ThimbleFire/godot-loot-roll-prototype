@@ -68,4 +68,5 @@ func _on_btn_add_pressed() -> void:
 	var content = await popup.button_pressed
 	popup.queue_free()
 	var index = table_names.find(content["table_name"])
-	print(root.get_child(index).get_text(0))
+	var table_item = root.get_child(index)
+	add_row(table_item, content["row_data"])
