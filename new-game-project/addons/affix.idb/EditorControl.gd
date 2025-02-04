@@ -3,65 +3,53 @@ class_name EditorController extends Control
 
 var tree: Tree
 var root: TreeItem
-var texture_delete: Texture2D = preload("res://addons/affix.idb/btn_delete.png")
-var texture: Texture2D = preload("res://addons/affix.idb/btn_new.png")
 var database: SQLite
 var table_names = []
+
+func _exit_tree() -> void:
+	tree.clear()
+	database.close_db()
+	pass
 
 func _enter_tree() -> void:
 	database = SQLite.new()
 	database.open_db()
 	tree = $Tree
+	populate_database_view()
+	
+func populate_database_view() -> void:
+	tree.clear()
 	root = tree.create_item()
 	
 	database.query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
 	table_names = database.query_result
 	for table_name in table_names:
-		add_tree_header(table_name["name"])
+		build_table(table_name["name"])
 	
-func _exit_tree() -> void:
-	tree.clear()
-	database.close_db()
-	pass
-	
-func add_tree_header(title:String) -> void:
-	var treeItem: TreeItem = tree.create_item(root)
-	treeItem.set_text(0, title)
-	treeItem.set_icon(0, texture)
-	treeItem.set_text_alignment(0, HORIZONTAL_ALIGNMENT_LEFT)
-	treeItem.set_custom_bg_color(0, Color(0.25, 0.26, 0.298))
-	treeItem.set_custom_bg_color(1, Color(0.25, 0.26, 0.298))
-	populate_table_entries(treeItem)
-	treeItem.set_collapsed_recursive(true)
+func build_table(table_name:String) -> void:
+	var table_item: TreeItem = tree.create_item(root)
+	table_item.set_text(0, table_name)
+	table_item.set_text_alignment(0, HORIZONTAL_ALIGNMENT_LEFT)
+	table_item.set_custom_bg_color(0, Color(0.25, 0.26, 0.298))
+	table_item.set_custom_bg_color(1, Color(0.25, 0.26, 0.298))
+	database.query("SELECT * FROM " + table_name)
+	for row_data in database.query_result:
+		add_row(table_item, row_data)
+	table_item.set_collapsed_recursive(true)
 
-# this is cool but it's not scaleable, we should consider reverting back to having individual functions setting up tables
-func populate_table_entries(treeItem: TreeItem) -> void:
-	var category_name = treeItem.get_text(0)
-	var query = "SELECT * FROM " + category_name
-	database.query(query)
-
-	for row in database.query_result:
-		var ch = treeItem.create_child()
-		ch.add_button(1, texture_delete)
-		ch.set_text(0, str(row["id"]))
-		ch.set_metadata(0, row)
-		for key in row.keys():  # Loop through column names (keys)
-			var field = ch.create_child()
-			field.set_text(0, key)  # Set column name
-			# don't allow editing for foreign key ids
-			var is_id = key.ends_with("id")
-			match typeof(row[key]):
-				TYPE_INT:
-					field.set_text(1, str(row[key]))
-				TYPE_FLOAT:
-					field.set_text(1, str(row[key]))
-				TYPE_STRING:
-					field.set_text(1, row[key])
-				TYPE_BOOL:
-					field.set_checked(1, row[key])
-			if not is_id:
-				field.set_editable(1, true)  
-				field.set_custom_bg_color(1, Color(0.21, 0.21, 0.3))
+func add_row(table_item: TreeItem, row_data: Dictionary) -> TreeItem:
+	var row:TreeItem = table_item.create_child()
+	row.add_button(1, preload("res://addons/affix.idb/btn_delete.png"))
+	row.set_text(0, str(row_data["id"]))
+	row.set_metadata(0, row_data)
+	for key in row_data.keys():
+		var field = row.create_child()
+		field.set_text(0, key)  # Set column name
+		field.set_text(1, str(row_data[key]))	
+		var is_id = key.ends_with("id")
+		if not is_id:
+			field.set_editable(1, true)
+			field.set_custom_bg_color(1, Color(0.21, 0.21, 0.3))
 	
 func item_edited() -> void:
 	var treeItem: TreeItem = tree.get_edited()
