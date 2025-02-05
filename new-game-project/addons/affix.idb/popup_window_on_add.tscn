@@ -15,7 +15,6 @@ initial_position = 1
 size = Vector2i(415, 320)
 unresizable = true
 always_on_top = true
-popup_window = true
 script = ExtResource("1_d2sp1")
 
 [node name="PopupMenu" type="PopupMenu" parent="."]
@@ -44,7 +43,18 @@ grow_vertical = 2
 theme = ExtResource("2_tlk67")
 toggle_mode = false
 flat = true
+selected = 0
 allow_reselect = true
+item_count = 5
+popup/item_0/text = "Items"
+popup/item_1/text = "LootTables"
+popup/item_1/id = 1
+popup/item_2/text = "Monsters"
+popup/item_2/id = 2
+popup/item_3/text = "ItemEntries"
+popup/item_3/id = 3
+popup/item_4/text = "TableEntries"
+popup/item_4/id = 4
 
 [node name="Button" type="Button" parent="background"]
 layout_mode = 1
@@ -86,12 +96,12 @@ grow_horizontal = 2
 grow_vertical = 2
 columns = 2
 allow_reselect = true
-allow_search = false
 enable_recursive_folding = false
 hide_root = true
 scroll_horizontal_enabled = false
 
 [connection signal="close_requested" from="." to="." method="_on_close_requested"]
+[connection signal="files_dropped" from="." to="." method="_on_files_dropped"]
 [connection signal="id_pressed" from="PopupMenu" to="." method="_on_popup_menu_id_pressed"]
 [connection signal="item_selected" from="background/OptionButton" to="." method="_on_option_button_item_selected"]
 [connection signal="pressed" from="background/Button" to="." method="_on_button_pressed"]
