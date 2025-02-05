@@ -54,7 +54,7 @@ func _on_option_button_item_selected(index: int) -> void:
 			treeItem.set_editable(1, true)
 		treeItem.set_custom_bg_color(1, Color(0.21, 0.21, 0.3))
 
-func create_table_tree_item() -> TreeItem:
+func create_table_tree_item(table_name) -> TreeItem:
 	root = tree.create_item()
 	header = tree.create_item(root)
 	header.set_text(0, table_name)
@@ -121,14 +121,5 @@ func _on_button_pressed() -> void:
 	var last_inserted_row = Pluggy.database.last_insert_rowid
 	var actual_data = { "id": last_inserted_row }
 
-	row_data.clear()
-
-	# compile a display copy (the difference being this one is all text, even in place of an id)
-	for i in range(0, child_count):
-		var item: TreeItem = header.get_child(i)
-		var key = item.get_text(0)
-		var value = item.get_text(1)
-		row_data[key] = value
-	
 	actual_data.merge(row_data)
 	button_pressed.emit({"table_name": table_name, "row_data": actual_data})

@@ -42,20 +42,32 @@ func build_table(table_name:String) -> void:
 	table_item.set_collapsed_recursive(true)
 
 func add_row(table_item: TreeItem, row_data: Dictionary) -> void:
+	var table_name = table_item.get_text(0)
 	var row:TreeItem = table_item.create_child()
 	row.add_button(1, preload("res://addons/affix.idb/btn_delete.png"))
 	row.set_text(0, str(row_data["id"]))
 	row.set_metadata(0, row_data)
 	for key in row_data.keys():
 		var field = row.create_child()
-		field.set_text(0, key)  # Set column name
-		field.set_text(1, str(row_data[key]))
+		field.set_text(0, key)
 		var is_id = key.ends_with("id")
 		if not is_id:
+			field.set_text(1, str(row_data[key]))
 			field.set_editable(1, true)
 			field.set_custom_bg_color(1, Color(0.21, 0.21, 0.3))
 		else:
-			continue
+			if key == "id":
+				continue
+			Pluggy.database.query("PRAGMA foreign_key_list(" + table_name + ")")
+			for fk in Pluggy.database.query_result:
+				if fk["from"] == key:
+					Pluggy.database.query_with_bindings("SELECT name FROM " + fk["table"] + " WHERE id = ?", [row_data[key]])
+					print(Pluggy.database.query_result)
+					var id_display_name: String = Pluggy.database.query_result.front()["name"]
+					field.set_text(1, id_display_name)
+					field.set_metadata(1, row_data[key])
+					field.set_tooltip_text(1, "id: " + str(row_data[key]))
+					break
 	
 func item_edited() -> void:
 	var treeItem: TreeItem = tree.get_edited()
@@ -68,9 +80,6 @@ func _on_tree_button_clicked(item: TreeItem, column: int, id: int, mouse_button_
 	Pluggy.database.foreign_keys = true
 	Pluggy.database.query("PRAGMA foreign_keys = ON;")
 	var table_name = item.get_parent().get_text(0)
-	Pluggy.database.query_with_bindings("DELETE FROM " + table_name + " WHERE id = ?", [str(item.get_metadata(0)["id"])])
-	item.get_parent().remove_child(item)
-
 	# loop through all the tables
 	for table in table_names:
 		# get the tables foreign key list
@@ -85,9 +94,11 @@ func _on_tree_button_clicked(item: TreeItem, column: int, id: int, mouse_button_
 				for ch in t.get_children():
 					# if the child's foreign key value is equal to the key being deleted
 					var table_column_name = ch.get_metadata(0)[foreign_key["from"]]
-					var table_column_value = str(item.get_metadata(0)["id"])
+					var table_column_value = item.get_metadata(0)["id"]
 					if table_column_name == table_column_value:
 						t.remove_child(ch)
+	Pluggy.database.query_with_bindings("DELETE FROM " + table_name + " WHERE id = ?", [str(item.get_metadata(0)["id"])])
+	item.get_parent().remove_child(item)
 
 func _on_btn_add_pressed() -> void:
 	var popup:MyPopup = preload("res://addons/affix.idb/popup_window_on_add.tscn").instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)

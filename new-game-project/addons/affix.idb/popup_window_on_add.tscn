@@ -44,7 +44,6 @@ grow_vertical = 2
 theme = ExtResource("2_tlk67")
 toggle_mode = false
 flat = true
-selected = 0
 allow_reselect = true
 
 [node name="Button" type="Button" parent="background"]
