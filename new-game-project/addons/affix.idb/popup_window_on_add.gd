@@ -109,18 +109,26 @@ func _on_button_pressed() -> void:
 	var table_name = header.get_text(0)
 	var child_count = header.get_child_count()
 
+	# compile a database copy (the difference being this one has a number in place of an id)
 	var row_data = {}
 	for i in range(0, child_count):
 		var item: TreeItem = header.get_child(i)
 		var key = item.get_text(0)
-
-		# Retrieve ID if metadata exists, otherwise use the text value
 		var value = item.get_metadata(1) if item.get_metadata(1) != null else item.get_text(1)
 		row_data[key] = value
 	
 	Pluggy.database.insert_row(table_name, row_data)
-	
 	var last_inserted_row = Pluggy.database.last_insert_rowid
 	var actual_data = { "id": last_inserted_row }
+
+	row_data.clear()
+
+	# compile a display copy (the difference being this one is all text, even in place of an id)
+	for i in range(0, child_count):
+		var item: TreeItem = header.get_child(i)
+		var key = item.get_text(0)
+		var value = item.get_text(1)
+		row_data[key] = value
+	
 	actual_data.merge(row_data)
 	button_pressed.emit({"table_name": table_name, "row_data": actual_data})
