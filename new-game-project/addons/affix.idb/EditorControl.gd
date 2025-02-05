@@ -51,8 +51,8 @@ func add_row(table_item: TreeItem, row_data: Dictionary) -> void:
 		var field = row.create_child()
 		field.set_text(0, key)
 		var is_id = key.ends_with("id")
+		field.set_text(1, str(row_data[key]))
 		if not is_id:
-			field.set_text(1, str(row_data[key]))
 			field.set_editable(1, true)
 			field.set_custom_bg_color(1, Color(0.21, 0.21, 0.3))
 		else:
