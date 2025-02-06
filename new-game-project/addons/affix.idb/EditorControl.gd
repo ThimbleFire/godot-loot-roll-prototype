@@ -71,6 +71,8 @@ func add_row(table_item: TreeItem, row_data: Dictionary) -> void:
 						field.set_text(1, id_display_name)
 						field.set_metadata(1, row_data[key])
 						field.set_tooltip_text(1, "id: " + str(row_data[key]))
+						field.set_icon(1, preload("res://addons/affix.idb/ico_key")
+						field.set_icon_alignment(0, HORIZONTAL_ALIGNMENT_RIGHT)
 			FieldType.SPRITE:
 				field.set_icon(1, BLOB_to_texture(row_data[key]))
 			FieldType.TEXT:
@@ -106,14 +108,14 @@ func _on_tree_button_clicked(item: TreeItem, column: int, id: int, mouse_button_
 			# if that key is used by this table
 			if table_name == foreign_key["table"]:
 				# get the table
-				var t: TreeItem = get_tree_table_by_table_name(table)
+				var table_with_foreign_key: TreeItem = get_tree_table_by_table_name(table)
 				# for each child of the table
-				for ch in t.get_children():
+				for row in table_with_foreign_keys.get_children():
 					# if the child's foreign key value is equal to the key being deleted
-					var table_column_name = ch.get_metadata(0)[foreign_key["from"]]
+					var table_column_name = row.get_metadata(0)[foreign_key["from"]]
 					var table_column_value = item.get_metadata(0)["id"]
 					if table_column_name == table_column_value:
-						t.remove_child(ch)
+						table_with_foreign_keys.remove_child(row)
 	Pluggy.database.query_with_bindings("DELETE FROM " + table_name + " WHERE id = ?", [str(item.get_metadata(0)["id"])])
 	item.get_parent().remove_child(item)
 
