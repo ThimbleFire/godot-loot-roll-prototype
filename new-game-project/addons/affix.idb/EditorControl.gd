@@ -1,6 +1,12 @@
 @tool
 class_name EditorController extends Control
 
+enum FieldType = {
+	TEXT,
+	ID,
+	FOREIGN_KEY,
+	SPRITE }
+
 var tree: Tree
 var root: TreeItem
 var table_names = []
@@ -50,24 +56,31 @@ func add_row(table_item: TreeItem, row_data: Dictionary) -> void:
 	for key in row_data.keys():
 		var field = row.create_child()
 		field.set_text(0, key)
-		var is_id = key.ends_with("id")
-		field.set_text(1, str(row_data[key]))
-		if not is_id:
-			field.set_editable(1, true)
-			field.set_custom_bg_color(1, Color(0.21, 0.21, 0.3))
-		else:
-			if key == "id":
-				continue
-			Pluggy.database.query("PRAGMA foreign_key_list(" + table_name + ")")
-			for fk in Pluggy.database.query_result:
-				if fk["from"] == key:
-					Pluggy.database.query_with_bindings("SELECT name FROM " + fk["table"] + " WHERE id = ?", [row_data[key]])
-					print(Pluggy.database.query_result)
-					var id_display_name: String = Pluggy.database.query_result.front()["name"]
-					field.set_text(1, id_display_name)
-					field.set_metadata(1, row_data[key])
-					field.set_tooltip_text(1, "id: " + str(row_data[key]))
-					break
+		var field_type: FieldType = FieldType.ID if key == "id" else FieldType.FOREIGN_KEY if key.ends_with("id") else FieldType.SPRITE if key.ends_with("sprite") else FieldType.TEXT
+
+		match field_type:
+			FieldType.ID:
+				field.set_text(1, str(row_data["id"]))
+				pass
+			FieldType.FOREIGN_KEY:
+				Pluggy.database.query("PRAGMA foreign_key_list(" + table_name + ")")
+				for fk in Pluggy.database.query_result:
+					if fk["from"] == key:
+						Pluggy.database.query_with_bindings("SELECT name FROM " + fk["table"] + " WHERE id = ?", [row_data[key]])
+						print(Pluggy.database.query_result)
+						var id_display_name: String = Pluggy.database.query_result.front()["name"]
+						field.set_text(1, id_display_name)
+						field.set_metadata(1, row_data[key])
+						field.set_tooltip_text(1, "id: " + str(row_data[key]))
+				pass
+			FieldType.SPRITE:
+				field.set_icon(1, BLOB_to_texture(row_data[key]))
+				pass
+			FieldType.TEXT:
+				field.set_editable(1, true)
+				field.set_custom_bg_color(1, Color(0.21, 0.21, 0.3))
+				field.set_text(1, str(row_data[key]))	
+				pass
 	
 func item_edited() -> void:
 	var treeItem: TreeItem = tree.get_edited()
