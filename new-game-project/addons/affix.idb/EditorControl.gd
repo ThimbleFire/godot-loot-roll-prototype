@@ -1,7 +1,7 @@
 @tool
 class_name EditorController extends Control
 
-enum FieldType = {
+enum FieldType {
 	TEXT,
 	ID,
 	FOREIGN_KEY,
@@ -71,16 +71,16 @@ func add_row(table_item: TreeItem, row_data: Dictionary) -> void:
 						field.set_text(1, id_display_name)
 						field.set_metadata(1, row_data[key])
 						field.set_tooltip_text(1, "id: " + str(row_data[key]))
-						field.set_icon(1, preload("res://addons/affix.idb/ico_key")
-						field.set_icon_alignment(0, HORIZONTAL_ALIGNMENT_RIGHT)
+						field.set_icon(1, preload("res://addons/affix.idb/ico_key.png"))
 			FieldType.SPRITE:
-				field.set_icon(1, BLOB_to_texture(row_data[key]))
+				if row_data[key] != null:
+					field.set_icon(1, BLOB_to_texture(row_data[key]))
 			FieldType.TEXT:
 				field.set_editable(1, true)
 				field.set_custom_bg_color(1, Color(0.21, 0.21, 0.3))
 				field.set_text(1, str(row_data[key]))
 
-func BLOB_to_texture(bpa: PackedByteArray) -> ImageTexture:
+func BLOB_to_texture(pba: PackedByteArray) -> ImageTexture:
 	var image = Image.new()
 	if image.load_png_from_buffer(pba) == OK:
 		return ImageTexture.create_from_image(image)
@@ -108,7 +108,7 @@ func _on_tree_button_clicked(item: TreeItem, column: int, id: int, mouse_button_
 			# if that key is used by this table
 			if table_name == foreign_key["table"]:
 				# get the table
-				var table_with_foreign_key: TreeItem = get_tree_table_by_table_name(table)
+				var table_with_foreign_keys: TreeItem = get_tree_table_by_table_name(table)
 				# for each child of the table
 				for row in table_with_foreign_keys.get_children():
 					# if the child's foreign key value is equal to the key being deleted
