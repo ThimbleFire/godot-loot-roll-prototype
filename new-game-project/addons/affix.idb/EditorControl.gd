@@ -61,7 +61,6 @@ func add_row(table_item: TreeItem, row_data: Dictionary) -> void:
 		match field_type:
 			FieldType.ID:
 				field.set_text(1, str(row_data["id"]))
-				pass
 			FieldType.FOREIGN_KEY:
 				Pluggy.database.query("PRAGMA foreign_key_list(" + table_name + ")")
 				for fk in Pluggy.database.query_result:
@@ -72,15 +71,20 @@ func add_row(table_item: TreeItem, row_data: Dictionary) -> void:
 						field.set_text(1, id_display_name)
 						field.set_metadata(1, row_data[key])
 						field.set_tooltip_text(1, "id: " + str(row_data[key]))
-				pass
 			FieldType.SPRITE:
 				field.set_icon(1, BLOB_to_texture(row_data[key]))
-				pass
 			FieldType.TEXT:
 				field.set_editable(1, true)
 				field.set_custom_bg_color(1, Color(0.21, 0.21, 0.3))
-				field.set_text(1, str(row_data[key]))	
-				pass
+				field.set_text(1, str(row_data[key]))
+
+func BLOB_to_texture(bpa: PackedByteArray) -> ImageTexture:
+	var image = Image.new()
+	if image.load_png_from_buffer(pba) == OK:
+		return ImageTexture.create_from_image(image)
+	else:
+		print("Failed  to load image from byte array")
+		return null
 	
 func item_edited() -> void:
 	var treeItem: TreeItem = tree.get_edited()
