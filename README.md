@@ -1,59 +1,33 @@
-![image](https://i.imgur.com/TTpKgMs.png)
+What do you want for UI
 
-We declare Goblin in-game. We start by getting its id.<br>
-`database.query_with_bindings("SELECT id FROM Monsters WHERE name = ?", [monster_name])`
+Uhh...
 
-**Monsters**
+I want a tree where each element represents an a step in an order of operations used to generate the game world
 
-|id|name
-|:-:|:-:|
-|1|Goblin|
+```
+define mapsize
+define seed points
+define quad tree
+define voronoi
+define external heightmap
+define biomes
+define regional biomes
+define hillsides
+define doodads
+```
 
-We get all loot tables belonging to the monster with that id.<br>
-`database.query_with_bindings("SELECT loot_table_id FROM MonsterLootTables WHERE monster_table_id = ?", [id])`
+* 2 hoziontal boxes. 
+* On the left-hand side you have a list of all the operations you can perform. 
+* On the right you have a list of all the operations being performed in the order they're listed. 
+* You can drag and drop to re-organise the elements of the list in the right. 
+* While an element is selected on the left you can click a button to move it to the right box
 
-**MonsterLootTables**
+  Yeah we might not want to do that, too time consuming. Just make it a one-and-done tool. It can still show the map as a preview but setting up tools for re-arranging the order of operations won't be worth it.
 
-|id|monster_table_id|loot_table_id|
-|:-:|:-:|:-:|
-|1|	1|	1|
-|2|	1|	2|
-|3|	1|	3|
+  Okay, so, just a button that says "generate" that populates a database?
 
-For each monster loot table tied to that id we get all loot entries belonging to that table<br>
-`database.query_with_bindings("SELECT * FROM LootEntries WHERE loot_table_id = ?", [table["loot_table_id"]])`
+  I'm sure we can do better than that, surely. MMMMMM...
 
-**LootEntries**
+  Well, it's a tool, it's meant to be general-use tool, not for a singular purpose.
 
-|id|loot_table_id|item_id|probability|quantity|
-|:-:|:-:|:-:|:-:|:-:|
-|1|	3|	1|	1.0|	1|
-|2|	3|	1|	5.0|	5|
-|3|	3|	1|	9.0|	9|
-|4|	3|	1|	15.0|	15|
-|5|	3|	1|	25.0|	25|
-|6|	2|	5|	12.0|	12|
-|7|	2|	6|	9.0|	9|
-|8|	1|	2|	12.0|	1|
-|9|	1|	3|	12.0|	1|
-|10|1|	4|	12.0|	1|
-
-For each item in the table being iterated, we get the item name.<br>
-`database.query_with_bindings("SELECT name FROM Items WHERE id = ?", [item["item_id"]])`
-
-**Items**
-
-|id|name|
-|:-:|:----:|
-| 1 |	Coin |
-| 2 |	Bronze Sword |
-| 3 |	Bronze Shield |
-| 4 |	Bronze Spear |
-| 5 |	Bronze Bolt |
-| 6 |	Bronze Arrow |
-| 7 |	Goblin Sword |
-| 8 |	Oak Log |
-| 9 |	Knife |
-| 10 | Bronze Axe |
-| 11 | Tinderbox |
-
+  If you wanna make a game, make a game. But don't tie it into this thing, y'know?
