@@ -74,7 +74,8 @@ func add_row(table_item: TreeItem, row_data: Dictionary) -> void:
 						field.set_icon(1, preload("res://addons/affix.idb/ico_key.png"))
 			FieldType.SPRITE:
 				if row_data[key] != null:
-					field.set_icon(1, BLOB_to_texture(row_data[key]))
+					pass
+					#field.set_icon(1, BLOB_to_texture(row_data[key]))
 			FieldType.TEXT:
 				field.set_editable(1, true)
 				field.set_custom_bg_color(1, Color(0.21, 0.21, 0.3))
