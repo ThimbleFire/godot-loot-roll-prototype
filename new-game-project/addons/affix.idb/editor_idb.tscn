@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://clpao6u26dy43"]
 
-[ext_resource type="Script" path="res://addons/affix.idb/EditorControl.gd" id="1_cnsqy"]
+[ext_resource type="Script" uid="uid://t311ge188h5r" path="res://addons/affix.idb/EditorControl.gd" id="1_cnsqy"]
 [ext_resource type="Texture2D" uid="uid://cgp0mpcntb5bu" path="res://addons/affix.idb/btn_add.png" id="2_aanhj"]
 [ext_resource type="Texture2D" uid="uid://ca2eaexktn65l" path="res://addons/affix.idb/btn_search.png" id="3_wpni2"]
 

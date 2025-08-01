@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://cpmeouk46x6iy"]
 
-[ext_resource type="Script" path="res://addons/affix.idb/popup_window_on_add.gd" id="1_d2sp1"]
+[ext_resource type="Script" uid="uid://deugx4ogc2lcw" path="res://addons/affix.idb/popup_window_on_add.gd" id="1_d2sp1"]
 [ext_resource type="Theme" uid="uid://bm6qtua01kp2g" path="res://new_theme.tres" id="2_tlk67"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_51qgy"]
